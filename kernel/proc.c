@@ -489,7 +489,7 @@ scheduler(void)
      //struct proc *min_proc = myproc();
      for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if(p->state == RUNNABLE && (p->pass <= min_pass || min_pass < 0)) {
+      if(p->state == RUNNABLE && (p->pass < min_pass || min_pass < 0)) {
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.  
@@ -509,8 +509,9 @@ scheduler(void)
           
           //min_proc = p;
           p->state = RUNNING;
-          c->proc = p;
           p->num_ticks++;
+          p->pass += p->stride;
+          c->proc = p;
           swtch(&c->context, &p->context);
 
           // Process is done running for now.
@@ -778,6 +779,7 @@ int sched_statistics(){
     if(p->state == UNUSED)
       continue;
     printf("%d(%s): tickets %d, ticks: %d\n", p->pid, p->name, p->ticket_value, p->num_ticks);
+    //printf("stride: %d\n", p->stride);
   }
   release(&wait_lock);
   return 0;
@@ -790,7 +792,9 @@ int sched_tickets(int n){
   p->stride = K / p->ticket_value;
   p->pass = p->stride;
   p->num_ticks = 0;
+  
   release(&wait_lock);
+  //sched_statistics();
   return 0;
 }
 
