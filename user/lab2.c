@@ -33,12 +33,6 @@ int main(int argc, char *argv[])
     sleep(sleep_ticks);
     sched_statistics();
     for (int i = 0; i < n_proc; i++) kill(proc_pid[i]);
-    /*
-   int n = 0;
-   if(argc >=2)
-    n= atoi(argv[1]);
-   printf("%d \n", sched_statistics());
-    printf("%d \n", sched_tickets(n));
-*/
+
     exit(0);
 }
